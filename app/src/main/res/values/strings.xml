@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">ServiceDemo</string>
+
+    <string name="counter_channel_name">Counter Service Channel</string>
+    <string name="counter_channel_description">Channel for Counter Service notifications</string>
+    <string name="counter_notification_title">Counter Service</string>
+    <string name="counter_value">Count: %d</string>
+    <string name="stop">Stop</string>
+</resources>
