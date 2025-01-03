@@ -1,37 +1,45 @@
 package com.android.servicedemo
 
 import android.content.Intent
+import android.location.Location
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.android.servicedemo.service.LocationWithCounterService
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class CounterActivity : AppCompatActivity() {
+class LocationWithCounterActivity : AppCompatActivity() {
     private val counterTextView by lazy { findViewById<TextView>(R.id.counterTextView) }
+    private val latLngTextView by lazy { findViewById<TextView>(R.id.latLngTextView) }
     private val stopButton by lazy { findViewById<Button>(R.id.stopButton) }
-    private val viewModel by lazy { CounterViewModel.getInstance() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_counter)
-        stopButton.setOnClickListener { stopCounter() }
-        observeCounter()
+        stopButton.setOnClickListener { stopService() }
+        initObservers()
     }
 
     override fun onResume() {
         super.onResume()
-        if (!CounterService.isRunning) {
+        if (!LocationWithCounterService.Companion.isRunning) {
             finish()
             return
         }
     }
 
-    private fun observeCounter() {
+    private fun initObservers() {
         lifecycleScope.launch {
-            viewModel.counterFlow.collect { count ->
+            LocationWithCounterService.Companion.counterFlow.collect { count ->
                 updateCounterDisplay(count)
+            }
+        }
+        lifecycleScope.launch {
+            LocationWithCounterService.Companion.locationFlow.collectLatest { location ->
+                updateLatLngDisplay(location)
             }
         }
     }
@@ -40,8 +48,12 @@ class CounterActivity : AppCompatActivity() {
         counterTextView.text = count.toString()
     }
 
-    private fun stopCounter() {
-        stopService(Intent(this, CounterService::class.java))
+    private fun updateLatLngDisplay(location: Location?) {
+        latLngTextView.text = location?.longitude.toString() + ", " + location?.latitude.toString()
+    }
+
+    private fun stopService() {
+        stopService(Intent(this, LocationWithCounterService::class.java))
         startActivity(Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
         })

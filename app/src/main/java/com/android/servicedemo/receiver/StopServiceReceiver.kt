@@ -1,9 +1,10 @@
-package com.android.servicedemo
+package com.android.servicedemo.receiver
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.app.ActivityManager
+import android.content.BroadcastReceiver
+import com.android.servicedemo.service.LocationWithCounterService
+import com.android.servicedemo.MainActivity
 
 class StopServiceReceiver : BroadcastReceiver() {
     companion object {
@@ -14,7 +15,7 @@ class StopServiceReceiver : BroadcastReceiver() {
         if (intent?.action == ACTION_STOP_SERVICE) {
             context?.let {
                 // Stop the service
-                val serviceIntent = Intent(context, CounterService::class.java)
+                val serviceIntent = Intent(context, LocationWithCounterService::class.java)
                 context.stopService(serviceIntent)
 
                 // Start MainActivity with clear top flag
